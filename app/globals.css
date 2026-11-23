@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+/*
+  Paleta de la marca (logo y gráficas de Hugo): negro, naranja #F48A1E y azul #0149AD.
+  --sea es el azul principal (botones, enlaces). --orange es el naranja de marca para fondos y formas.
+  --clay es un naranja oscuro apto para texto sobre fondo claro (el naranja de marca no da contraste).
+  Los nombres de variable vienen de la primera versión; solo cambian los valores.
+*/
+:root {
+  --ink: #14171c;
+  --ink-soft: #4b5563;
+  --sea: #0149ad;
+  --sea-dark: #013783;
+  --sea-soft: #e6eef9;
+  --sand: #fff8f0;
+  --sand-deep: #fbe8d2;
+  --orange: #f48a1e;
+  --clay: #a85200;
+  --line: #e6d9c8;
+  --white: #ffffff;
+  --danger: #a3322a;
+  --ok: #2c7a4b;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-sea: var(--sea);
+  --color-sea-dark: var(--sea-dark);
+  --color-sea-soft: var(--sea-soft);
+  --color-sand: var(--sand);
+  --color-sand-deep: var(--sand-deep);
+  --color-clay: var(--clay);
+  --color-orange: var(--orange);
+  --color-line: var(--line);
+  --color-danger: var(--danger);
+  --color-ok: var(--ok);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--sand);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+:focus-visible {
+  outline: 3px solid var(--clay);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    transition:
+      background-color 0.2s,
+      transform 0.2s,
+      box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+  .btn-primary {
+    background: var(--sea);
+    color: var(--white);
+  }
+  .btn-primary:hover {
+    background: var(--sea-dark);
+  }
+  .btn-ghost {
+    border: 1.5px solid var(--sea);
+    color: var(--sea-dark);
+    background: transparent;
+  }
+  .btn-ghost:hover {
+    background: var(--sea-soft);
+  }
+  .btn-danger {
+    border: 1.5px solid var(--danger);
+    color: var(--danger);
+  }
+  .btn-danger:hover {
+    background: #f9e6e4;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .field {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--white);
+    padding: 0.65rem 0.9rem;
+    color: var(--ink);
+  }
+  .field:focus {
+    border-color: var(--sea);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--sea-soft);
+  }
+  .label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .card {
+    border-radius: 20px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    padding: 1.5rem;
+  }
+}
