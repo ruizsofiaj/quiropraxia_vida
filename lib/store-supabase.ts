@@ -1,3 +1,4 @@
+import { TABLE_PREFIX } from "./demo";
 import { SEED } from "./seed";
 import type { Appointment, Block, DB, Service, Settings } from "./types";
 
@@ -30,7 +31,8 @@ async function rest<T = unknown>(
   init: { method?: string; body?: unknown; prefer?: string } = {},
 ): Promise<T> {
   const { url, key } = cfg();
-  const res = await fetch(`${url}/rest/v1/${path}`, {
+  // El path siempre empieza con el nombre de la tabla; la demo usa tablas con prefijo (demo_...).
+  const res = await fetch(`${url}/rest/v1/${TABLE_PREFIX}${path}`, {
     method: init.method ?? "GET",
     cache: "no-store",
     headers: {

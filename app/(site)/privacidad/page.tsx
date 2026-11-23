@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { BUSINESS } from "@/lib/business";
 
-export const metadata: Metadata = { title: "Política de privacidad | Quiropraxia & Vida" };
+export const metadata: Metadata = { title: `Política de privacidad | ${BUSINESS.name}` };
 
 /*
   BORRADOR: Hugo debe revisarlo con quien corresponda antes de publicar.
@@ -29,7 +29,7 @@ export default function PrivacidadPage() {
         <ul className="mt-2 list-disc space-y-1 pl-6 text-ink-soft">
           <li>Nombre y WhatsApp: para reservar tu turno y escribirte si hay cambios o un recordatorio.</li>
           <li>
-            Motivo de consulta (opcional): es un dato de salud. Lo ve solo Hugo, y no se envía por
+            Motivo de consulta (opcional): es un dato de salud. Lo ve solo {BUSINESS.firstName}, y no se envía por
             WhatsApp ni por ningún otro medio.
           </li>
         </ul>
@@ -42,7 +42,7 @@ export default function PrivacidadPage() {
       <section>
         <h2 className="text-2xl font-semibold">Tus derechos</h2>
         <p className="mt-2 text-ink-soft">
-          Podés pedir acceso, rectificación o eliminación de tus datos escribiendo a Hugo por WhatsApp. La
+          Podés pedir acceso, rectificación o eliminación de tus datos escribiendo a {BUSINESS.firstName} por WhatsApp. La
           Agencia de Acceso a la Información Pública es el órgano de control de la Ley 25.326 y atiende
           denuncias y reclamos por incumplimientos.
         </p>

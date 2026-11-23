@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Figtree } from "next/font/google";
 import "./globals.css";
 import { BUSINESS } from "@/lib/business";
+import { IS_DEMO } from "@/lib/demo";
 
 const display = Fraunces({
   variable: "--font-display",
@@ -17,8 +18,9 @@ const body = Figtree({
 
 export const metadata: Metadata = {
   title: `${BUSINESS.name} | Quiropraxia y kinesiología`,
-  description:
-    "Alivio tu dolor recuperando tu equilibrio. Reservá tu turno online con el Lic. Hugo Rodriguez, quiropráctico y kinesiólogo.",
+  description: `${BUSINESS.tagline}. Reservá tu turno online con ${BUSINESS.professional}.`,
+  // La demo no debe aparecer en Google.
+  ...(IS_DEMO ? { robots: { index: false, follow: false } } : {}),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

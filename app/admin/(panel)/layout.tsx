@@ -7,7 +7,7 @@ import { BUSINESS } from "@/lib/business";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Panel | Quiropraxia & Vida",
+  title: `Panel | ${BUSINESS.name}`,
   robots: { index: false, follow: false },
 };
 

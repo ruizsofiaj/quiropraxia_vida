@@ -4,7 +4,6 @@ import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchSlots, submitBooking, type BookingState } from "@/app/actions";
 import { fmtDateLong, fmtTime } from "@/lib/time";
-import { waLink } from "@/lib/business";
 import { DatePicker } from "./DatePicker";
 import { CheckIcon, ClockIcon } from "./icons";
 
@@ -15,6 +14,8 @@ type Props = {
   openDows: number[];
   today: string;
   maxDays: number;
+  contactName: string; // nombre del profesional y link de WhatsApp: vienen del servidor (la demo usa otros)
+  contactHref: string;
   reschedule?: {
     token: string;
     serviceId: string;
@@ -26,7 +27,7 @@ type Props = {
 
 const initial: BookingState = {};
 
-export function BookingFlow({ services, openDows, today, maxDays, reschedule }: Props) {
+export function BookingFlow({ services, openDows, today, maxDays, contactName, contactHref, reschedule }: Props) {
   // Con un solo servicio se elige solo y se oculta el primer paso.
   const single = services.length === 1;
   const n = single ? 0 : 1;
@@ -134,8 +135,8 @@ export function BookingFlow({ services, openDows, today, maxDays, reschedule }: 
           ) : slots.length === 0 ? (
             <p className="rounded-2xl bg-white p-4 text-ink-soft">
               No quedan horarios ese día. Probá con otro día o{" "}
-              <a className="font-semibold text-sea underline" href={waLink("Hola Hugo, no encontré turno disponible. ¿Me ayudás?")}>
-                escribile a Hugo
+              <a className="font-semibold text-sea underline" href={contactHref}>
+                escribile a {contactName}
               </a>
               .
             </p>
@@ -198,7 +199,7 @@ export function BookingFlow({ services, openDows, today, maxDays, reschedule }: 
           </div>
           <div className="sm:col-span-2">
             <label className="label" htmlFor="reason">
-              Motivo de consulta <span className="font-normal text-ink-soft">(opcional; solo lo ve Hugo)</span>
+              Motivo de consulta <span className="font-normal text-ink-soft">(opcional; solo lo ve {contactName})</span>
             </label>
             <textarea id="reason" name="reason" rows={3} maxLength={500} className="field" defaultValue={reschedule?.reason} />
           </div>

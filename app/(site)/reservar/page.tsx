@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { BookingFlow } from "@/components/BookingFlow";
+import { BUSINESS, waLink } from "@/lib/business";
 import { readDB } from "@/lib/store";
 import { todayArt } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Reservar turno | Quiropraxia & Vida" };
+export const metadata: Metadata = { title: `Reservar turno | ${BUSINESS.name}` };
 
 export default async function ReservarPage({
   searchParams,
@@ -36,6 +37,8 @@ export default async function ReservarPage({
           openDows={openDows}
           today={todayArt()}
           maxDays={db.settings.maxDays}
+          contactName={BUSINESS.firstName}
+          contactHref={waLink(`Hola ${BUSINESS.firstName}, no encontré turno disponible. ¿Me ayudás?`)}
           reschedule={
             current
               ? {

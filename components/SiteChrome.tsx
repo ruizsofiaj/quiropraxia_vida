@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BUSINESS, waLink } from "@/lib/business";
+import { IS_DEMO } from "@/lib/demo";
 import { InstagramIcon, WhatsAppIcon } from "./icons";
 
 export function SiteHeader() {
@@ -8,21 +9,27 @@ export function SiteHeader() {
     <header className="sticky top-0 z-30 border-b border-line/70 bg-sand/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link href="/" aria-label={`${BUSINESS.name}, inicio`}>
-          <Image
-            src="/brand/logo-marca.png"
-            alt={BUSINESS.name}
-            width={1698}
-            height={194}
-            priority
-            className="h-6 w-auto sm:h-7"
-          />
+          {IS_DEMO ? (
+            <span className="font-serif text-xl font-semibold">
+              Quiropraxia <span className="text-sea">Ejemplo</span>
+            </span>
+          ) : (
+            <Image
+              src="/brand/logo-marca.png"
+              alt={BUSINESS.name}
+              width={1698}
+              height={194}
+              priority
+              className="h-6 w-auto sm:h-7"
+            />
+          )}
         </Link>
         <nav aria-label="Principal" className="flex items-center gap-1 sm:gap-3">
           <Link href="/#servicios" className="hidden px-3 py-2 text-sm font-medium hover:text-sea md:block">
             Consulta
           </Link>
-          <Link href="/#sobre-hugo" className="hidden px-3 py-2 text-sm font-medium hover:text-sea md:block">
-            Sobre Hugo
+          <Link href="/#sobre-mi" className="hidden px-3 py-2 text-sm font-medium hover:text-sea md:block">
+            Sobre {BUSINESS.firstName}
           </Link>
           <Link href="/#ubicacion" className="hidden px-3 py-2 text-sm font-medium hover:text-sea md:block">
             Ubicación
@@ -41,13 +48,17 @@ export function SiteFooter() {
     <footer className="mt-24 bg-ink text-sand">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:grid-cols-3">
         <div>
-          <Image
-            src="/brand/logo-marca-claro.png"
-            alt={BUSINESS.name}
-            width={1698}
-            height={194}
-            className="h-7 w-auto"
-          />
+          {IS_DEMO ? (
+            <span className="font-serif text-xl font-semibold">{BUSINESS.name}</span>
+          ) : (
+            <Image
+              src="/brand/logo-marca-claro.png"
+              alt={BUSINESS.name}
+              width={1698}
+              height={194}
+              className="h-7 w-auto"
+            />
+          )}
           <p className="mt-3 text-sm text-sand/75">{BUSINESS.title}</p>
         </div>
         <div className="text-sm">
@@ -96,7 +107,7 @@ export function SiteFooter() {
 export function WhatsAppFab() {
   return (
     <a
-      href={waLink("Hola Hugo, quería consultarte por un turno.")}
+      href={waLink(`Hola ${BUSINESS.firstName}, quería consultarte por un turno.`)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Escribir por WhatsApp"

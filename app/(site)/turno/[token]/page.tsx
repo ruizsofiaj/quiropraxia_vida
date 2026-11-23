@@ -9,12 +9,12 @@ import { fmtDateLong, fmtTime, hoursUntil } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Tu turno | Quiropraxia & Vida",
+  title: `Tu turno | ${BUSINESS.name}`,
   robots: { index: false, follow: false },
 };
 
 const ERRORS: Record<string, string> = {
-  late: "Ya falta poco para tu turno, así que no se puede cancelar desde acá. Escribile a Hugo por WhatsApp.",
+  late: `Ya falta poco para tu turno, así que no se puede cancelar desde acá. Escribile a ${BUSINESS.firstName} por WhatsApp.`,
   "not-found": "No pudimos cancelar este turno.",
 };
 
@@ -85,7 +85,7 @@ export default async function TurnoPage({
 
         {!cancelled && nuevo && (
           <p className="mt-6 rounded-xl bg-sea-soft p-4 text-sm">
-            Hugo te va a escribir por WhatsApp al número que dejaste para confirmarte el turno.
+            {BUSINESS.firstName} te va a escribir por WhatsApp al número que dejaste para confirmarte el turno.
           </p>
         )}
 
@@ -106,7 +106,7 @@ export default async function TurnoPage({
         {!cancelled && !canManage && !past && (
           <p className="mt-4 text-sm text-ink-soft">
             Se puede cancelar o mover hasta {db.settings.cancelLimitHours} horas antes. Ahora escribile a
-            Hugo por WhatsApp.
+            {BUSINESS.firstName} por WhatsApp.
           </p>
         )}
 

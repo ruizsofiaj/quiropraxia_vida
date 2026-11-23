@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { login } from "../actions";
 import { isAdmin } from "@/lib/auth";
+import { IS_DEMO } from "@/lib/demo";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -21,6 +22,11 @@ export default async function LoginPage({
     <div className="grid flex-1 place-items-center px-4 py-16">
       <form action={login} className="card w-full max-w-sm space-y-4 !p-8">
         <h1 className="text-3xl font-semibold">Panel de turnos</h1>
+        {IS_DEMO && (
+          <p className="rounded-xl bg-sand-deep p-3 text-sm">
+            Es una demo. La contraseña es <code className="font-bold">{process.env.ADMIN_PASSWORD}</code>.
+          </p>
+        )}
         <div>
           <label className="label" htmlFor="password">Contraseña</label>
           <input id="password" name="password" type="password" required autoComplete="current-password" className="field" />
