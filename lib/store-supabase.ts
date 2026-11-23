@@ -69,6 +69,7 @@ type ApptRow = {
   source: "web" | "manual";
   created_at: string;
   confirmed_at: string | null;
+  reminder_sent_at: string | null;
 };
 type ServiceRow = {
   id: string;
@@ -103,6 +104,7 @@ const fromAppt = (r: ApptRow): Appointment => ({
   source: r.source,
   createdAt: iso(r.created_at),
   confirmedAt: r.confirmed_at ? iso(r.confirmed_at) : undefined,
+  reminderSentAt: r.reminder_sent_at ? iso(r.reminder_sent_at) : undefined,
 });
 const toAppt = (a: Appointment): ApptRow => ({
   id: a.id,
@@ -117,6 +119,7 @@ const toAppt = (a: Appointment): ApptRow => ({
   source: a.source,
   created_at: a.createdAt,
   confirmed_at: a.confirmedAt ?? null,
+  reminder_sent_at: a.reminderSentAt ?? null,
 });
 const fromService = (r: ServiceRow): Service => ({
   id: r.id,

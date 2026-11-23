@@ -59,6 +59,16 @@ export async function markConfirmed(token: string) {
   revalidatePath("/admin");
 }
 
+// Se llama al apretar "Recordatorio" (que abre WhatsApp): deja marcado que Hugo ya lo mandó.
+export async function markReminded(token: string) {
+  await guard();
+  await updateDB((db) => {
+    const a = db.appointments.find((x) => x.token === token);
+    if (a && a.status === "confirmed" && !a.reminderSentAt) a.reminderSentAt = new Date().toISOString();
+  });
+  revalidatePath("/admin");
+}
+
 export async function adminCreate(formData: FormData) {
   await guard();
   const serviceId = str(formData.get("serviceId"), 60);

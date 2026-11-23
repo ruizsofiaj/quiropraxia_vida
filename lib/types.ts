@@ -41,6 +41,8 @@ export type Appointment = {
   createdAt: string;
   // Cuándo Hugo confirmó el turno por WhatsApp. Se borra si el turno se mueve.
   confirmedAt?: string;
+  // Cuándo Hugo le mandó el recordatorio por WhatsApp. Se borra si el turno se mueve.
+  reminderSentAt?: string;
 };
 
 export type DB = {

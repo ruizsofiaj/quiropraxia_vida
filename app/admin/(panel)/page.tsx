@@ -2,12 +2,14 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { adminCancel } from "../actions";
 import { ConfirmWhatsApp } from "@/components/ConfirmWhatsApp";
-import { ChevronLeftIcon, ChevronRightIcon, WhatsAppIcon } from "@/components/icons";
+import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
+import { ReminderWhatsApp } from "@/components/ReminderWhatsApp";
 import { BUSINESS } from "@/lib/business";
 import { addMonths, isMonthStr, monthLabel, monthWeeks, WEEK_HEADERS } from "@/lib/calendar";
 import { waLinkTo } from "@/lib/phone";
 import { readDB } from "@/lib/store";
-import { artParts, dowOf, fmtDateLong, fmtDateStrLong, fmtTime, isDateStr, todayArt } from "@/lib/time";
+import type { Appointment } from "@/lib/types";
+import { addDays, artParts, dowOf, fmtDateLong, fmtDateStrLong, fmtTime, isDateStr, todayArt } from "@/lib/time";
 
 export default async function AgendaPage({
   searchParams,
@@ -38,6 +40,23 @@ export default async function AgendaPage({
   const pending = db.appointments.filter(
     (a) => a.status === "confirmed" && !a.confirmedAt && new Date(a.endISO).getTime() > nowMs,
   ).length;
+
+  // Recordatorios que Hugo tiene que mandar: turnos de hoy (que todavía no pasaron) y de mañana, sin recordatorio enviado.
+  const tomorrow = addDays(today, 1);
+  const isDue = (a: Appointment) =>
+    a.status === "confirmed" &&
+    !a.reminderSentAt &&
+    new Date(a.endISO).getTime() > nowMs &&
+    [today, tomorrow].includes(artParts(new Date(a.startISO)).date);
+  const dueList = db.appointments.filter(isDue).sort((a, b) => a.startISO.localeCompare(b.startISO));
+  const serviceName = (a: Appointment) => db.services.find((s) => s.id === a.serviceId)?.name ?? "consulta";
+  const reminderHref = (a: Appointment) =>
+    waLinkTo(
+      a.phone,
+      `Hola ${a.name.split(" ")[0]}, te recuerdo tu turno de ${serviceName(a)} el ${fmtDateLong(a.startISO)} a las ${fmtTime(a.startISO)} hs en ${BUSINESS.address}, ${BUSINESS.city}. ¡Te espero! ${BUSINESS.professional}`,
+    );
+  const whenLabel = (a: Appointment) =>
+    `${artParts(new Date(a.startISO)).date === today ? "Hoy" : "Mañana"} ${fmtTime(a.startISO)} hs`;
 
   const blocksFor = (d: string) =>
     db.blocks.filter((b) => {
@@ -72,6 +91,38 @@ export default async function AgendaPage({
           </Link>
         </div>
       </div>
+
+      {dueList.length > 0 && (
+        <section
+          role="alert"
+          aria-labelledby="recordatorios"
+          className="mt-4 rounded-2xl border-2 border-danger bg-red-50 p-4"
+        >
+          <h2 id="recordatorios" className="flex items-center gap-2 text-base font-bold text-danger">
+            <span aria-hidden>⚠</span> Recordatorios para enviar ({dueList.length})
+          </h2>
+          <p className="mt-1 text-sm text-danger">
+            Estos pacientes tienen turno hoy o mañana y todavía no les mandaste el recordatorio.
+          </p>
+          <ul className="mt-3 space-y-2">
+            {dueList.map((a) => (
+              <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white p-3">
+                <p className="text-sm">
+                  <strong>{whenLabel(a)}</strong> · {a.name}
+                </p>
+                <ReminderWhatsApp
+                  token={a.token}
+                  name={a.name}
+                  sent={false}
+                  urgent
+                  label="Enviar recordatorio"
+                  href={reminderHref(a)}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {pending > 0 && (
         <p role="status" className="mt-4 rounded-xl bg-sand-deep px-4 py-3 text-sm font-medium">
@@ -121,7 +172,10 @@ export default async function AgendaPage({
                 {list.length > 0 && (
                   <span className="mt-1 flex flex-wrap gap-0.5 md:hidden">
                     {list.slice(0, 4).map((a) => (
-                      <span key={a.id} className={`h-2 w-2 rounded-full ${a.confirmedAt ? "bg-ok" : "bg-orange"}`} />
+                      <span
+                        key={a.id}
+                        className={`h-2 w-2 rounded-full ${isDue(a) ? "bg-danger" : a.confirmedAt ? "bg-ok" : "bg-orange"}`}
+                      />
                     ))}
                   </span>
                 )}
@@ -131,7 +185,11 @@ export default async function AgendaPage({
                     <span
                       key={a.id}
                       className={`truncate rounded px-1.5 py-0.5 text-xs font-medium ${
-                        a.confirmedAt ? "bg-green-100 text-ok" : "bg-orange/80 text-ink"
+                        isDue(a)
+                          ? "bg-red-100 text-danger ring-1 ring-danger/50"
+                          : a.confirmedAt
+                            ? "bg-green-100 text-ok"
+                            : "bg-orange/80 text-ink"
                       }`}
                     >
                       {fmtTime(a.startISO)} {a.name.split(" ")[0]}
@@ -147,6 +205,7 @@ export default async function AgendaPage({
       <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-soft">
         <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-ok" /> Confirmado</span>
         <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-orange" /> Sin confirmar</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-danger" /> Falta recordatorio</span>
         <span>Los días en gris no tienen atención.</span>
       </p>
 
@@ -188,6 +247,16 @@ export default async function AgendaPage({
                           Sin confirmar
                         </span>
                       )}
+                      {isDue(a) && (
+                        <span className="ml-2 rounded-full bg-danger px-2 py-0.5 text-xs font-semibold text-white">
+                          Falta recordatorio
+                        </span>
+                      )}
+                      {a.reminderSentAt && (
+                        <span className="ml-2 rounded-full bg-sand-deep px-2 py-0.5 text-xs font-normal">
+                          ✓ Recordatorio enviado
+                        </span>
+                      )}
                       {a.source === "manual" && (
                         <span className="ml-2 rounded-full bg-sand-deep px-2 py-0.5 text-xs font-normal">cargado a mano</span>
                       )}
@@ -205,18 +274,13 @@ export default async function AgendaPage({
                         `Hola ${a.name.split(" ")[0]}, soy el ${BUSINESS.professional}. Tu turno de ${svc?.name ?? "consulta"} está confirmado para el ${fmtDateLong(a.startISO)} a las ${fmtTime(a.startISO)} hs en ${BUSINESS.address}, ${BUSINESS.city}.\n\nSi necesitás cancelarlo o moverlo, entrá acá: ${origin}/turno/${a.token}`,
                       )}
                     />
-                    <a
-                      href={waLinkTo(
-                        a.phone,
-                        `Hola ${a.name.split(" ")[0]}, te recuerdo tu turno de ${svc?.name ?? "consulta"} el ${fmtDateLong(a.startISO)} a las ${fmtTime(a.startISO)} hs en ${BUSINESS.address}, ${BUSINESS.city}. ¡Te espero! ${BUSINESS.professional}`,
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Enviar recordatorio por WhatsApp a ${a.name}`}
-                      className="btn btn-ghost !min-h-10 !px-4 text-sm"
-                    >
-                      <WhatsAppIcon className="h-5 w-5" /> Recordatorio
-                    </a>
+                    <ReminderWhatsApp
+                      token={a.token}
+                      name={a.name}
+                      sent={Boolean(a.reminderSentAt)}
+                      urgent={isDue(a)}
+                      href={reminderHref(a)}
+                    />
                     <form action={adminCancel}>
                       <input type="hidden" name="token" value={a.token} />
                       <button className="btn btn-danger !min-h-10 !px-4 text-sm">Cancelar</button>

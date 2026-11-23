@@ -43,6 +43,7 @@ create table appointments (
   source text not null default 'web' check (source in ('web', 'manual')),
   created_at timestamptz not null default now(),
   confirmed_at timestamptz,         -- cuándo Hugo confirmó por WhatsApp
+  reminder_sent_at timestamptz,     -- cuándo Hugo mandó el recordatorio
   -- Evita que dos turnos confirmados se pisen, aunque lleguen a la vez.
   constraint no_overlap exclude using gist (
     tstzrange(start_at, end_at) with &&

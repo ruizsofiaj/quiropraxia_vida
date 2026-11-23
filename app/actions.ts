@@ -96,6 +96,7 @@ export async function submitBooking(
       existing.startISO = start.toISOString();
       existing.endISO = endISO;
       existing.confirmedAt = undefined; // el horario cambió: Hugo tiene que volver a confirmar
+      existing.reminderSentAt = undefined; // y volver a mandar el recordatorio
       existing.name = name;
       existing.phone = phone;
       existing.reason = reason || undefined;
