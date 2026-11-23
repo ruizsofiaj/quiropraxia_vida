@@ -3,7 +3,7 @@
 
 create extension if not exists btree_gist;
 
-create table demo_services (
+create table if not exists demo_services (
   id text primary key,
   name text not null,
   description text not null default '',
@@ -11,7 +11,7 @@ create table demo_services (
   price_label text not null default 'A confirmar'
 );
 
-create table demo_settings (
+create table if not exists demo_settings (
   id int primary key default 1 check (id = 1),
   weekly jsonb not null,            -- 7 días: { open, ranges: [{start, end}] }, 0 = domingo
   buffer_min int not null default 10,
@@ -21,7 +21,7 @@ create table demo_settings (
   step_min int not null default 30
 );
 
-create table demo_blocks (
+create table if not exists demo_blocks (
   id uuid primary key default gen_random_uuid(),
   start_at timestamptz not null,
   end_at timestamptz not null,
@@ -29,7 +29,7 @@ create table demo_blocks (
   check (end_at > start_at)
 );
 
-create table demo_appointments (
+create table if not exists demo_appointments (
   id uuid primary key default gen_random_uuid(),
   token text not null unique default encode(gen_random_bytes(16), 'hex'),
   service_id text not null references demo_services(id),
@@ -45,7 +45,7 @@ create table demo_appointments (
   confirmed_at timestamptz,         -- cuándo Hugo confirmó por WhatsApp
   reminder_sent_at timestamptz,     -- cuándo Hugo mandó el recordatorio
   -- Evita que dos turnos confirmados se pisen, aunque lleguen a la vez.
-  constraint no_overlap exclude using gist (
+  constraint demo_no_overlap exclude using gist (
     tstzrange(start_at, end_at) with &&
   ) where (status = 'confirmed')
 );
