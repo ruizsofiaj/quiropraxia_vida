@@ -1,5 +1,3 @@
-import { TABLE_PREFIX } from "./demo";
-import { SEED } from "./seed";
 import type { Appointment, Block, DB, Service, Settings } from "./types";
 
 /*
@@ -26,13 +24,14 @@ function cfg() {
   return { url, key };
 }
 
-async function rest<T = unknown>(
+async function restRaw<T = unknown>(
+  scope: string,
   path: string,
   init: { method?: string; body?: unknown; prefer?: string } = {},
 ): Promise<T> {
   const { url, key } = cfg();
-  // El path siempre empieza con el nombre de la tabla; la demo usa tablas con prefijo (demo_...).
-  const res = await fetch(`${url}/rest/v1/${TABLE_PREFIX}${path}`, {
+  // El path siempre empieza con el nombre de la tabla; la demo y los clientes extra usan tablas con prefijo.
+  const res = await fetch(`${url}/rest/v1/${scope}${path}`, {
     method: init.method ?? "GET",
     cache: "no-store",
     headers: {
@@ -169,7 +168,13 @@ const toBlock = (b: Block): BlockRow => ({
 
 const UPSERT = "resolution=merge-duplicates,return=minimal";
 
-async function load(): Promise<DB> {
+const restFor =
+  (scope: string) =>
+  <T = unknown>(path: string, init: Parameters<typeof restRaw>[2] = {}) =>
+    restRaw<T>(scope, path, init);
+
+async function load(scope: string, SEED: DB): Promise<DB> {
+  const rest = restFor(scope);
   const [settings, services, blocks, appointments] = await Promise.all([
     rest<SettingsRow[]>("settings?select=*&id=eq.1"),
     rest<ServiceRow[]>("services?select=*&order=name.asc"),
@@ -195,8 +200,8 @@ async function load(): Promise<DB> {
   };
 }
 
-export async function readSupabaseDB(): Promise<DB> {
-  return load();
+export async function readSupabaseDB(scope: string, seed: DB): Promise<DB> {
+  return load(scope, seed);
 }
 
 let queue: Promise<unknown> = Promise.resolve();
@@ -205,9 +210,14 @@ function changed<T extends { id: string }>(before: Map<string, string>, rows: T[
   return rows.filter((r) => before.get(r.id) !== JSON.stringify(r));
 }
 
-export function updateSupabaseDB<T>(fn: (db: DB) => T | Promise<T>): Promise<T> {
+export function updateSupabaseDB<T>(
+  scope: string,
+  seed: DB,
+  fn: (db: DB) => T | Promise<T>,
+): Promise<T> {
+  const rest = restFor(scope);
   const run = queue.then(async () => {
-    const db = await load();
+    const db = await load(scope, seed);
     const snap = {
       settings: JSON.stringify(db.settings),
       services: new Map(db.services.map((s) => [s.id, JSON.stringify(s)])),

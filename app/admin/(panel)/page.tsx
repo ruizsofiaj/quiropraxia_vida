@@ -4,7 +4,7 @@ import { adminCancel } from "../actions";
 import { ConfirmWhatsApp } from "@/components/ConfirmWhatsApp";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
 import { ReminderWhatsApp } from "@/components/ReminderWhatsApp";
-import { BUSINESS } from "@/lib/business";
+import { getProfile } from "@/lib/profile";
 import { addMonths, isMonthStr, monthLabel, monthWeeks, WEEK_HEADERS } from "@/lib/calendar";
 import { waLinkTo } from "@/lib/phone";
 import { readDB } from "@/lib/store";
@@ -16,6 +16,7 @@ export default async function AgendaPage({
 }: {
   searchParams: Promise<{ mes?: string; fecha?: string }>;
 }) {
+  const P = await getProfile();
   const sp = await searchParams;
   const today = todayArt();
   const mes = isMonthStr(sp.mes) ? sp.mes : isDateStr(sp.fecha) ? sp.fecha.slice(0, 7) : today.slice(0, 7);
@@ -49,11 +50,11 @@ export default async function AgendaPage({
     new Date(a.endISO).getTime() > nowMs &&
     [today, tomorrow].includes(artParts(new Date(a.startISO)).date);
   const dueList = db.appointments.filter(isDue).sort((a, b) => a.startISO.localeCompare(b.startISO));
-  const serviceName = (a: Appointment) => db.services.find((s) => s.id === a.serviceId)?.name ?? "consulta";
+  const serviceName = (a: Appointment) => db.services.find((s) => s.id === a.serviceId)?.name ?? P.vocab.service;
   const reminderHref = (a: Appointment) =>
     waLinkTo(
       a.phone,
-      `Hola ${a.name.split(" ")[0]}, te recuerdo tu turno de ${serviceName(a)} el ${fmtDateLong(a.startISO)} a las ${fmtTime(a.startISO)} hs en ${BUSINESS.address}, ${BUSINESS.city}. ¡Te espero! ${BUSINESS.professional}`,
+      `Hola ${a.name.split(" ")[0]}, te recuerdo tu turno de ${serviceName(a)} el ${fmtDateLong(a.startISO)} a las ${fmtTime(a.startISO)} hs en ${P.address}, ${P.city}. ${P.msg.signoff}`,
     );
   const whenLabel = (a: Appointment) =>
     `${artParts(new Date(a.startISO)).date === today ? "Hoy" : "Mañana"} ${fmtTime(a.startISO)} hs`;
@@ -102,7 +103,7 @@ export default async function AgendaPage({
             <span aria-hidden>⚠</span> Recordatorios para enviar ({dueList.length})
           </h2>
           <p className="mt-1 text-sm text-danger">
-            Estos pacientes tienen turno hoy o mañana y todavía no les mandaste el recordatorio.
+            Estos {P.vocab.clients} tienen turno hoy o mañana y todavía no les mandaste el recordatorio.
           </p>
           <ul className="mt-3 space-y-2">
             {dueList.map((a) => (
@@ -271,7 +272,7 @@ export default async function AgendaPage({
                       confirmed={Boolean(a.confirmedAt)}
                       href={waLinkTo(
                         a.phone,
-                        `Hola ${a.name.split(" ")[0]}, soy el ${BUSINESS.professional}. Tu turno de ${svc?.name ?? "consulta"} está confirmado para el ${fmtDateLong(a.startISO)} a las ${fmtTime(a.startISO)} hs en ${BUSINESS.address}, ${BUSINESS.city}.\n\nSi necesitás cancelarlo o moverlo, entrá acá: ${origin}/turno/${a.token}`,
+                        `Hola ${a.name.split(" ")[0]}, ${P.msg.confirmIntro}. Tu turno de ${svc?.name ?? P.vocab.service} está confirmado para el ${fmtDateLong(a.startISO)} a las ${fmtTime(a.startISO)} hs en ${P.address}, ${P.city}.\n\nSi necesitás cancelarlo o moverlo, entrá acá: ${origin}/turno/${a.token}`,
                       )}
                     />
                     <ReminderWhatsApp

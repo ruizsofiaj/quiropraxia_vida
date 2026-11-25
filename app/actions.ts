@@ -3,6 +3,7 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { computeSlots } from "@/lib/availability";
+import { getProfile } from "@/lib/profile";
 import { isOverlapError, readDB, updateDB } from "@/lib/store";
 import { artParts } from "@/lib/time";
 import type { Appointment } from "@/lib/types";
@@ -47,6 +48,7 @@ export async function submitBooking(
   if (!serviceId || !startISO || Number.isNaN(Date.parse(startISO)))
     return { error: "Elegí un servicio, un día y un horario." };
 
+  const P = await getProfile();
   const now = new Date();
   const start = new Date(startISO);
   const dateStr = artParts(start).date;
@@ -78,7 +80,7 @@ export async function submitBooking(
       if (hoursLeft < db.settings.cancelLimitHours)
         return {
           ok: false,
-          error: `Solo se puede mover un turno hasta ${db.settings.cancelLimitHours} horas antes. Escribile a Hugo por WhatsApp.`,
+          error: `Solo se puede mover un turno hasta ${db.settings.cancelLimitHours} horas antes. ${P.msg.writeToUs} por WhatsApp.`,
         } as const;
     }
 

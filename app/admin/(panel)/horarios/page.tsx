@@ -1,11 +1,12 @@
 import { addBlock, deleteBlock, saveHours, saveRules, saveServices } from "../../actions";
+import { getProfile } from "@/lib/profile";
 import { readDB } from "@/lib/store";
 import { artParts, fmtDateStrLong, todayArt, WEEKDAYS } from "@/lib/time";
 
 const OK: Record<string, string> = {
   horarios: "Horarios guardados.",
   reglas: "Reglas guardadas.",
-  servicios: "Consultas guardadas.",
+  servicios: "Cambios guardados.",
   bloqueo: "Bloqueos actualizados.",
   "bloqueo-error": "Revisá las fechas del bloqueo.",
 };
@@ -15,6 +16,8 @@ export default async function HorariosPage({
 }: {
   searchParams: Promise<{ ok?: string }>;
 }) {
+  const P = await getProfile();
+  const Scap = P.vocab.service.charAt(0).toUpperCase() + P.vocab.service.slice(1);
   const { ok } = await searchParams;
   const db = await readDB();
   const s = db.settings;
@@ -81,7 +84,7 @@ export default async function HorariosPage({
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold">Consultas y precios</h2>
+        <h2 className="text-xl font-semibold">{Scap}s y precios</h2>
         <form action={saveServices} className="card mt-3 space-y-5">
           <input type="hidden" name="count" value={db.services.length} />
           {db.services.map((svc, i) => (
@@ -106,15 +109,15 @@ export default async function HorariosPage({
             </div>
           ))}
           <div>
-            <p className="font-semibold">Agregar una consulta nueva</p>
+            <p className="font-semibold">Agregar a la lista</p>
             <div className="mt-2 grid gap-3 sm:grid-cols-[1fr_110px_150px]">
-              <input aria-label="Nombre nueva consulta" name="new_name" placeholder="Nombre" className="field" />
-              <input aria-label="Minutos nueva consulta" name="new_duration" type="number" placeholder="Min" className="field" />
-              <input aria-label="Precio nueva consulta" name="new_price" placeholder="Precio" className="field" />
-              <input aria-label="Descripción nueva consulta" name="new_description" placeholder="Descripción" className="field sm:col-span-3" />
+              <input aria-label="Nombre del nuevo" name="new_name" placeholder="Nombre" className="field" />
+              <input aria-label="Minutos del nuevo" name="new_duration" type="number" placeholder="Min" className="field" />
+              <input aria-label="Precio del nuevo" name="new_price" placeholder="Precio" className="field" />
+              <input aria-label="Descripción del nuevo" name="new_description" placeholder="Descripción" className="field sm:col-span-3" />
             </div>
           </div>
-          <button className="btn btn-primary">Guardar consultas</button>
+          <button className="btn btn-primary">Guardar cambios</button>
         </form>
       </section>
 

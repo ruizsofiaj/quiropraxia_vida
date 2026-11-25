@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
-import { BUSINESS } from "@/lib/business";
+import { getProfile } from "@/lib/profile";
 
-export const metadata: Metadata = { title: `Política de privacidad | ${BUSINESS.name}` };
+export async function generateMetadata(): Promise<Metadata> {
+  const P = await getProfile();
+  return { title: `Política de privacidad | ${P.name}` };
+}
 
 /*
-  BORRADOR: Hugo debe revisarlo con quien corresponda antes de publicar.
+  BORRADOR: el negocio debe revisarlo con quien corresponda antes de publicar.
   Referencia: Ley 25.326 de Protección de Datos Personales (Argentina).
   Completar: razón social o nombre completo del responsable, y domicilio.
 */
-export default function PrivacidadPage() {
+export default async function PrivacidadPage() {
+  const P = await getProfile();
   return (
     <article className="mx-auto max-w-3xl space-y-6 px-4 py-12 sm:px-6">
       <h1 className="text-4xl font-semibold">Política de privacidad</h1>
@@ -19,8 +23,7 @@ export default function PrivacidadPage() {
       <section>
         <h2 className="text-2xl font-semibold">Quién es responsable de tus datos</h2>
         <p className="mt-2 text-ink-soft">
-          {BUSINESS.professional} ({BUSINESS.name}). Domicilio: {BUSINESS.address}. Contacto por
-          WhatsApp: +{BUSINESS.whatsapp}.
+          {P.professional} ({P.name}). Domicilio: {P.address}. Contacto por WhatsApp: +{P.whatsapp}.
         </p>
       </section>
 
@@ -28,10 +31,7 @@ export default function PrivacidadPage() {
         <h2 className="text-2xl font-semibold">Qué datos pedimos y para qué</h2>
         <ul className="mt-2 list-disc space-y-1 pl-6 text-ink-soft">
           <li>Nombre y WhatsApp: para reservar tu turno y escribirte si hay cambios o un recordatorio.</li>
-          <li>
-            Motivo de consulta (opcional): es un dato de salud. Lo ve solo {BUSINESS.firstName}, y no se envía por
-            WhatsApp ni por ningún otro medio.
-          </li>
+          <li>{P.privacyNote}</li>
         </ul>
         <p className="mt-2 text-ink-soft">
           No usamos tus datos para publicidad ni los compartimos con terceros, salvo los proveedores
@@ -42,9 +42,9 @@ export default function PrivacidadPage() {
       <section>
         <h2 className="text-2xl font-semibold">Tus derechos</h2>
         <p className="mt-2 text-ink-soft">
-          Podés pedir acceso, rectificación o eliminación de tus datos escribiendo a {BUSINESS.firstName} por WhatsApp. La
-          Agencia de Acceso a la Información Pública es el órgano de control de la Ley 25.326 y atiende
-          denuncias y reclamos por incumplimientos.
+          Podés pedir acceso, rectificación o eliminación de tus datos escribiendo por WhatsApp. La Agencia
+          de Acceso a la Información Pública es el órgano de control de la Ley 25.326 y atiende denuncias y
+          reclamos por incumplimientos.
         </p>
       </section>
     </article>

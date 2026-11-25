@@ -1,4 +1,5 @@
 import { adminCreate } from "../../actions";
+import { getProfile } from "@/lib/profile";
 import { readDB } from "@/lib/store";
 import { isDateStr, todayArt } from "@/lib/time";
 
@@ -12,6 +13,8 @@ export default async function NuevoPage({
 }: {
   searchParams: Promise<{ error?: string; fecha?: string }>;
 }) {
+  const P = await getProfile();
+  const Scap = P.vocab.service.charAt(0).toUpperCase() + P.vocab.service.slice(1);
   const { error, fecha } = await searchParams;
   const defaultDate = isDateStr(fecha) && fecha >= todayArt() ? fecha : undefined;
   const db = await readDB();
@@ -26,7 +29,7 @@ export default async function NuevoPage({
 
       <form action={adminCreate} className="card mt-6 grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label className="label" htmlFor="serviceId">Consulta</label>
+          <label className="label" htmlFor="serviceId">{Scap}</label>
           <select id="serviceId" name="serviceId" required className="field">
             {db.services.map((s) => (
               <option key={s.id} value={s.id}>

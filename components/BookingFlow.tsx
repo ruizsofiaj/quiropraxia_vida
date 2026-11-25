@@ -14,8 +14,14 @@ type Props = {
   openDows: number[];
   today: string;
   maxDays: number;
-  contactName: string; // nombre del profesional y link de WhatsApp: vienen del servidor (la demo usa otros)
-  contactHref: string;
+  // Textos y link de WhatsApp: vienen del servidor, porque cambian según el negocio.
+  labels: {
+    servicePrompt: string;
+    noteLabel: string;
+    noteVisibleTo: string;
+    writeToUs: string;
+    writeHref: string;
+  };
   reschedule?: {
     token: string;
     serviceId: string;
@@ -27,7 +33,7 @@ type Props = {
 
 const initial: BookingState = {};
 
-export function BookingFlow({ services, openDows, today, maxDays, contactName, contactHref, reschedule }: Props) {
+export function BookingFlow({ services, openDows, today, maxDays, labels, reschedule }: Props) {
   // Con un solo servicio se elige solo y se oculta el primer paso.
   const single = services.length === 1;
   const n = single ? 0 : 1;
@@ -79,7 +85,7 @@ export function BookingFlow({ services, openDows, today, maxDays, contactName, c
       {/* 1. Servicio */}
       <fieldset hidden={single}>
         <legend className="font-serif text-2xl font-semibold">
-          <span className="mr-2 text-clay">1.</span>¿Qué consulta necesitás?
+          <span className="mr-2 text-clay">1.</span>{labels.servicePrompt}
         </legend>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {services.map((s) => {
@@ -135,8 +141,8 @@ export function BookingFlow({ services, openDows, today, maxDays, contactName, c
           ) : slots.length === 0 ? (
             <p className="rounded-2xl bg-white p-4 text-ink-soft">
               No quedan horarios ese día. Probá con otro día o{" "}
-              <a className="font-semibold text-sea underline" href={contactHref}>
-                escribile a {contactName}
+              <a className="font-semibold text-sea underline" href={labels.writeHref}>
+                {labels.writeToUs}
               </a>
               .
             </p>
@@ -199,7 +205,7 @@ export function BookingFlow({ services, openDows, today, maxDays, contactName, c
           </div>
           <div className="sm:col-span-2">
             <label className="label" htmlFor="reason">
-              Motivo de consulta <span className="font-normal text-ink-soft">(opcional; solo lo ve {contactName})</span>
+              {labels.noteLabel} <span className="font-normal text-ink-soft">(opcional; {labels.noteVisibleTo})</span>
             </label>
             <textarea id="reason" name="reason" rows={3} maxLength={500} className="field" defaultValue={reschedule?.reason} />
           </div>

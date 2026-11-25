@@ -92,3 +92,10 @@ export const ChevronRightIcon = ({ className }: P) => (
     <path d="m9 6 6 6-6 6" />
   </svg>
 );
+
+export const SparkIcon = ({ className }: P) => (
+  <svg {...base} className={className}>
+    <path d="M12 3.5 14 9l5.5 2-5.5 2-2 5.5-2-5.5L4.5 11 10 9l2-5.5Z" />
+    <path d="M19 3v3M17.5 4.5h3" />
+  </svg>
+);

@@ -3,20 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cancelBooking } from "@/app/actions";
 import { CheckIcon, MapPinIcon } from "@/components/icons";
-import { BUSINESS } from "@/lib/business";
+import { getProfile } from "@/lib/profile";
 import { readDB } from "@/lib/store";
 import { fmtDateLong, fmtTime, hoursUntil } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: `Tu turno | ${BUSINESS.name}`,
-  robots: { index: false, follow: false },
-};
 
-const ERRORS: Record<string, string> = {
-  late: `Ya falta poco para tu turno, así que no se puede cancelar desde acá. Escribile a ${BUSINESS.firstName} por WhatsApp.`,
-  "not-found": "No pudimos cancelar este turno.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const P = await getProfile();
+  return { title: `Tu turno | ${P.name}`, robots: { index: false, follow: false } };
+}
 
 export default async function TurnoPage({
   params,
@@ -25,11 +21,18 @@ export default async function TurnoPage({
   params: Promise<{ token: string }>;
   searchParams: Promise<{ nuevo?: string; error?: string }>;
 }) {
+  const P = await getProfile();
   const { token } = await params;
   const { nuevo, error } = await searchParams;
   const db = await readDB();
   const appt = db.appointments.find((a) => a.token === token);
   if (!appt) notFound();
+
+  const writeLower = P.msg.writeToUs.charAt(0).toLowerCase() + P.msg.writeToUs.slice(1);
+  const ERRORS: Record<string, string> = {
+    late: `Ya falta poco para tu turno, así que no se puede cancelar desde acá. ${P.msg.writeToUs} por WhatsApp.`,
+    "not-found": "No pudimos cancelar este turno.",
+  };
 
   const service = db.services.find((s) => s.id === appt.serviceId);
   const cancelled = appt.status === "cancelled";
@@ -37,6 +40,7 @@ export default async function TurnoPage({
   const hoursLeft = hoursUntil(appt.startISO);
   const canManage = !cancelled && hoursLeft >= db.settings.cancelLimitHours;
   const past = hoursLeft < 0;
+  const serviceCap = P.vocab.service.charAt(0).toUpperCase() + P.vocab.service.slice(1);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
@@ -58,7 +62,7 @@ export default async function TurnoPage({
 
         <dl className="mt-6 space-y-3">
           <div>
-            <dt className="text-sm text-ink-soft">Consulta</dt>
+            <dt className="text-sm text-ink-soft">{serviceCap}</dt>
             <dd className="font-semibold">{service?.name}</dd>
           </div>
           <div>
@@ -68,7 +72,7 @@ export default async function TurnoPage({
           <div>
             <dt className="text-sm text-ink-soft">Dónde</dt>
             <dd className="flex items-start gap-2 font-semibold">
-              <MapPinIcon className="mt-0.5 h-5 w-5 shrink-0 text-sea" /> {BUSINESS.address}
+              <MapPinIcon className="mt-0.5 h-5 w-5 shrink-0 text-sea" /> {P.address}
             </dd>
           </div>
           <div>
@@ -85,7 +89,7 @@ export default async function TurnoPage({
 
         {!cancelled && nuevo && (
           <p className="mt-6 rounded-xl bg-sea-soft p-4 text-sm">
-            {BUSINESS.firstName} te va a escribir por WhatsApp al número que dejaste para confirmarte el turno.
+            {P.msg.willWriteYou} por WhatsApp al número que dejaste para confirmarte el turno.
           </p>
         )}
 
@@ -105,8 +109,8 @@ export default async function TurnoPage({
 
         {!cancelled && !canManage && !past && (
           <p className="mt-4 text-sm text-ink-soft">
-            Se puede cancelar o mover hasta {db.settings.cancelLimitHours} horas antes. Ahora escribile a
-            {BUSINESS.firstName} por WhatsApp.
+            Se puede cancelar o mover hasta {db.settings.cancelLimitHours} horas antes. Ahora {writeLower} por
+            WhatsApp.
           </p>
         )}
 

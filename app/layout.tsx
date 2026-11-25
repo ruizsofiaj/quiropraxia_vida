@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Figtree } from "next/font/google";
 import "./globals.css";
-import { BUSINESS } from "@/lib/business";
-import { IS_DEMO } from "@/lib/demo";
+import { getProfile } from "@/lib/profile";
 
 const display = Fraunces({
   variable: "--font-display",
@@ -16,12 +15,17 @@ const body = Figtree({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: `${BUSINESS.name} | Quiropraxia y kinesiología`,
-  description: `${BUSINESS.tagline}. Reservá tu turno online con ${BUSINESS.professional}.`,
-  // La demo no debe aparecer en Google.
-  ...(IS_DEMO ? { robots: { index: false, follow: false } } : {}),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const P = await getProfile();
+  return {
+    title: `${P.name} | ${P.custom ? "Quiropraxia y kinesiología" : "Turnos online"}`,
+    description: P.custom
+      ? `${P.tagline}. Reservá tu turno online con ${P.professional}.`
+      : `${P.tagline} en ${P.name}.`,
+    // La demo no debe aparecer en Google.
+    ...(P.isDemo ? { robots: { index: false, follow: false } } : {}),
+  };
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

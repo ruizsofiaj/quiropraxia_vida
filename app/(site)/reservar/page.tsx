@@ -1,17 +1,22 @@
 import type { Metadata } from "next";
 import { BookingFlow } from "@/components/BookingFlow";
-import { BUSINESS, waLink } from "@/lib/business";
+import { getProfile, waLink } from "@/lib/profile";
 import { readDB } from "@/lib/store";
 import { todayArt } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: `Reservar turno | ${BUSINESS.name}` };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const P = await getProfile();
+  return { title: `Reservar turno | ${P.name}` };
+}
 
 export default async function ReservarPage({
   searchParams,
 }: {
   searchParams: Promise<{ reprogramar?: string }>;
 }) {
+  const P = await getProfile();
   const { reprogramar } = await searchParams;
   const db = await readDB();
 
@@ -37,8 +42,13 @@ export default async function ReservarPage({
           openDows={openDows}
           today={todayArt()}
           maxDays={db.settings.maxDays}
-          contactName={BUSINESS.firstName}
-          contactHref={waLink(`Hola ${BUSINESS.firstName}, no encontré turno disponible. ¿Me ayudás?`)}
+          labels={{
+            servicePrompt: `¿Qué ${P.vocab.service} necesitás?`,
+            noteLabel: P.msg.noteLabel,
+            noteVisibleTo: P.msg.noteVisibleTo,
+            writeToUs: P.msg.writeToUs.charAt(0).toLowerCase() + P.msg.writeToUs.slice(1),
+            writeHref: waLink(P, P.msg.waNoSlot),
+          }}
           reschedule={
             current
               ? {
