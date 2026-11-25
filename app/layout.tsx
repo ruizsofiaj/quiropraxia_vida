@@ -22,6 +22,22 @@ export async function generateMetadata(): Promise<Metadata> {
     description: P.custom
       ? `${P.tagline}. Reservá tu turno online con ${P.professional}.`
       : `${P.tagline} en ${P.name}.`,
+    // Hugo conserva su logo; los demás negocios y la demo usan un calendario genérico.
+    icons: P.custom
+      ? {
+          icon: [
+            { url: "/brand/hugo-favicon.ico", sizes: "any" },
+            { url: "/brand/hugo-icon.png", type: "image/png", sizes: "512x512" },
+          ],
+          apple: "/brand/hugo-apple.png",
+        }
+      : {
+          icon: [
+            { url: "/brand/turnos-favicon.ico", sizes: "any" },
+            { url: "/brand/turnos-icon.png", type: "image/png", sizes: "512x512" },
+          ],
+          apple: "/brand/turnos-apple.png",
+        },
     // La demo no debe aparecer en Google.
     ...(P.isDemo ? { robots: { index: false, follow: false } } : {}),
   };
