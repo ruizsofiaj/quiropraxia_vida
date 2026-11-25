@@ -27,9 +27,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const P = await getProfile();
   return (
-    <html lang="es-AR" className={`${display.variable} ${body.variable}`}>
+    <html
+      lang="es-AR"
+      data-palette={P.custom ? undefined : "neutral"}
+      className={`${display.variable} ${body.variable}`}
+    >
       <body className="min-h-screen flex flex-col">{children}</body>
     </html>
   );

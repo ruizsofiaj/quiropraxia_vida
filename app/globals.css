@@ -15,11 +15,30 @@
   --sand: #fff8f0;
   --sand-deep: #fbe8d2;
   --orange: #f48a1e;
+  --warn: var(--orange); /* estados que piden atención (turno sin confirmar) */
   --clay: #a85200;
   --line: #e6d9c8;
   --white: #ffffff;
   --danger: #a3322a;
   --ok: #2c7a4b;
+}
+
+/*
+  Paleta neutra para los negocios que no tienen colores propios (la demo y los clientes nuevos).
+  El sitio de Hugo conserva la de su marca. Solo el estado "sin confirmar" del panel usa un ámbar suave.
+*/
+:root[data-palette="neutral"] {
+  --ink: #1b1b1d;
+  --ink-soft: #5b5b60;
+  --sea: #2d3138;
+  --sea-dark: #15171a;
+  --sea-soft: #ebebed;
+  --sand: #f8f8f7;
+  --sand-deep: #ecebe9;
+  --orange: #cdc9c2;
+  --warn: #e0a940;
+  --clay: #66666b;
+  --line: #e2e1de;
 }
 
 @theme inline {
@@ -32,6 +51,7 @@
   --color-sand-deep: var(--sand-deep);
   --color-clay: var(--clay);
   --color-orange: var(--orange);
+  --color-warn: var(--warn);
   --color-line: var(--line);
   --color-danger: var(--danger);
   --color-ok: var(--ok);

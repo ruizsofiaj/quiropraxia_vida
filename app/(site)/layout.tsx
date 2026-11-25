@@ -56,7 +56,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             <span className="hidden sm:inline">Estás viendo el sitio como administrador.</span>
             <Link
               href="/admin"
-              className="inline-flex min-h-10 items-center gap-2 rounded-full bg-orange px-4 font-semibold text-ink hover:bg-[#ffa246]"
+              className="inline-flex min-h-10 items-center gap-2 rounded-full bg-orange px-4 font-semibold text-ink hover:brightness-95"
             >
               <span aria-hidden>←</span> Volver al panel
             </Link>

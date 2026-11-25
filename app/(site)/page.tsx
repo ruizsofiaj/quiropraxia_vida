@@ -248,7 +248,7 @@ export default async function Home() {
       <section className="mx-auto mt-16 max-w-6xl px-4 sm:px-6">
         <div className="rounded-[2rem] bg-ink p-8 text-sand sm:p-12">
           <h2 className="max-w-xl text-3xl font-semibold sm:text-4xl">{P.copy.ctaTitle}</h2>
-          <Link href="/reservar" className="btn mt-6 bg-orange text-ink hover:bg-[#ffa246]">
+          <Link href="/reservar" className="btn mt-6 bg-orange text-ink hover:brightness-95">
             Elegir día y horario <ArrowRightIcon className="h-5 w-5" />
           </Link>
         </div>

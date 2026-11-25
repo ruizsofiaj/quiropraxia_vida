@@ -175,7 +175,7 @@ export default async function AgendaPage({
                     {list.slice(0, 4).map((a) => (
                       <span
                         key={a.id}
-                        className={`h-2 w-2 rounded-full ${isDue(a) ? "bg-danger" : a.confirmedAt ? "bg-ok" : "bg-orange"}`}
+                        className={`h-2 w-2 rounded-full ${isDue(a) ? "bg-danger" : a.confirmedAt ? "bg-ok" : "bg-warn"}`}
                       />
                     ))}
                   </span>
@@ -190,7 +190,7 @@ export default async function AgendaPage({
                           ? "bg-red-100 text-danger ring-1 ring-danger/50"
                           : a.confirmedAt
                             ? "bg-green-100 text-ok"
-                            : "bg-orange/80 text-ink"
+                            : "bg-warn/80 text-ink"
                       }`}
                     >
                       {fmtTime(a.startISO)} {a.name.split(" ")[0]}
@@ -205,7 +205,7 @@ export default async function AgendaPage({
       </div>
       <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-soft">
         <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-ok" /> Confirmado</span>
-        <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-orange" /> Sin confirmar</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-warn" /> Sin confirmar</span>
         <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-danger" /> Falta recordatorio</span>
         <span>Los días en gris no tienen atención.</span>
       </p>
@@ -244,7 +244,7 @@ export default async function AgendaPage({
                           ✓ Confirmado
                         </span>
                       ) : (
-                        <span className="ml-2 rounded-full bg-orange px-2 py-0.5 text-xs font-semibold text-ink">
+                        <span className="ml-2 rounded-full bg-warn px-2 py-0.5 text-xs font-semibold text-ink">
                           Sin confirmar
                         </span>
                       )}
